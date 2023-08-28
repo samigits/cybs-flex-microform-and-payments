@@ -15,7 +15,7 @@ module.exports = {
         keyPass:"testrest"
     },
     logging:{
-        enableLog : true,
+        enableLog : false,
         LogFileName:"cybs",
         LogDirectory:"../../log",
         logfileMaxSize :5242880

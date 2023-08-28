@@ -92,31 +92,54 @@ const {
 
   exports.captureContextFromSdk = (req, res, next) =>{
     try{
-        var instance = new cybersourceRestApi.KeyGenerationApi(config)
+      const configObject = {
+        authenticationType: config.authenticationType,
+        runEnvironment: config.runEnvironment,
 
-        var request = new cybersourceRestApi.GeneratePublicKeyRequest();
-        request.encryptionType = "RsaOaep256"
-        request.targetOrigin = "http://localhost:3000"
+        merchantID: config.merchant.merchantId,
+        merchantKeyId: config.merchant.merchantKeyId,
+        merchantsecretKey: config.merchant.merchantSecretKey,
 
-        var opts = []
-        opts['format'] = 'JWT'
+        keyAlias: config.merchant.keyAlias,
+        keyPass: config.merchant.keyPass,
+        keyFileName: config.merchant.keyFileName,
+        keysDirectory: config.merchant.keysDirectory,
 
-        console.log("\n******* Generate Key *******");
+        useMetaKey: false,
+        portfolioID: "",
 
-        instance.generatePublicKey(request, opts, function(error, data, response){
-            if(error){
-                console.log("Error : " + error);
-                console.log("Error status code : " + error.statusCode);
-            } else if (data){
-                console.log("Data : " + JSON.stringify(data));
-                console.log("CaptureContext: " + data.keyId);
-            }
+        logConfiguration: {
+          enableLog: config.logging.enableLog,
+          logFileName: config.logging.LogFileName,
+          logDirectory: config.logging.logDirectory,
+          logFileMaxSize: config.logging.logfileMaxSize,
+          loggingLevel: "debug",
+          enableMasking: true,
+        },
+      }
+      var apiClient = new cybersourceRestApi.ApiClient();
+      var requestObj = new cybersourceRestApi.GenerateCaptureContextRequest();
 
-            res.json({
-                success: true,
-                data: JSON.parse(data)
-            })
+      requestObj.clientVersion = 'v2.0';
+      requestObj.targetOrigins = ["http://localhost"]
+      requestObj.allowedCardNetworks = ["VISA", "MASTERCARD"]
+
+      var instance = new cybersourceRestApi.MicroformIntegrationApi(configObject, apiClient);
+
+      instance.generateCaptureContext(requestObj, function(error, data, response){
+        if(error){
+          console.log("\nError: " , JSON.stringify(error))
+        }
+        else if(data){
+          console.log('\nData: ' + JSON.stringify(data))
+        }
+
+        res.json({
+          success: true,
+          data: data
         })
+      })
+
     }catch(err) {
         console.log("ccSdk: ", err)
     }
