@@ -1,5 +1,6 @@
 const superagent = require('superagent')
 const cybersourceRestApi = require('cybersource-rest-client')
+const jwt = require('jsonwebtoken')
 const {
     generateHttpSignature,
     digestGenerator,
@@ -133,10 +134,13 @@ const {
         else if(data){
           console.log('\nData: ' + JSON.stringify(data))
         }
-
+        const jwtToken = data
+        const decodedToken = jwt.decode(jwtToken, {complete: true})
+        //const verifiedToken = jwt.verify(jwtToken, 'f47ee8f5-8c1f-4d2d-b2a1-1f8e2cacab2a')
         res.json({
           success: true,
-          data: data
+          data: data,
+          decoded: decodedToken
         })
       })
 
