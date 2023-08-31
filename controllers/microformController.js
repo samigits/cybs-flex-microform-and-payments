@@ -148,3 +148,86 @@ const {
         console.log("ccSdk: ", err)
     }
   }
+
+  exports.payWithTransientToken = (req, res, next) =>{
+    try{
+      const configObject = {
+        authenticationType: config.authenticationType,
+        runEnvironment: config.runEnvironment,
+
+        merchantID: config.merchant.merchantId,
+        merchantKeyId: config.merchant.merchantKeyId,
+        merchantsecretKey: config.merchant.merchantSecretKey,
+
+        keyAlias: config.merchant.keyAlias,
+        keyPass: config.merchant.keyPass,
+        keyFileName: config.merchant.keyFileName,
+        keysDirectory: config.merchant.keysDirectory,
+
+        useMetaKey: false,
+        portfolioID: "",
+
+        logConfiguration: {
+          enableLog: config.logging.enableLog,
+          logFileName: config.logging.LogFileName,
+          logDirectory: config.logging.logDirectory,
+          logFileMaxSize: config.logging.logfileMaxSize,
+          loggingLevel: "debug",
+          enableMasking: true,
+        },
+      }
+
+      var instance = new cybersourceRestApi.PaymentsApi(configObject)
+      var clientReferenceInformation = new cybersourceRestApi.Ptsv2paymentsClientReferenceInformation()
+      clientReferenceInformation.code = "test_flex_payments"
+      var processingInformation = new cybersourceRestApi.Ptsv2paymentsProcessingInformation()
+      processingInformation.commerceIndicator = "internet";
+
+      var amountDetails =
+      new cybersourceRestApi.Ptsv2paymentsOrderInformationAmountDetails();
+      amountDetails.totalAmount = "102.21";
+      amountDetails.currency = "USD";
+
+      var billTo = new cybersourceRestApi.Ptsv2paymentsOrderInformationBillTo();
+      billTo.country = "US";
+      billTo.firstName = "John";
+      billTo.lastName = "Deo";
+      billTo.phoneNumber = "4158880000";
+      billTo.address1 = "test";
+      billTo.postalCode = "94105";
+      billTo.locality = "San Francisco";
+      billTo.administrativeArea = "MI";
+      billTo.email = "test@cybs.com";
+      billTo.address2 = "Address 2";
+      billTo.district = "MI";
+      billTo.buildingNumber = "123";
+      var orderInformation =
+      new cybersourceRestApi.Ptsv2paymentsOrderInformation();
+      orderInformation.amountDetails = amountDetails;
+      orderInformation.billTo = billTo;
+
+      var tokenInformation = new cybersourceRestApi.Ptsv2paymentsTokenInformation();
+      tokenInformation.transientTokenJwt =req.body.flexresponse 
+
+      var request = new cybersourceRestApi.CreatePaymentRequest();
+      request.clientReferenceInformation = clientReferenceInformation;
+      request.processingInformation = processingInformation;
+      request.orderInformation = orderInformation;
+      request.tokenInformation = tokenInformation;
+
+      instance.createPayment(request, function (error, data, response){
+        if(error){
+          console.log('\nError in process a payment : ' + JSON.stringify(error));
+          res.json({error: error})
+        }
+        else if(data){
+          console.log('\nData of process a payment : ' + JSON.stringify(data));
+          res.json({paymentStatus: data});
+        }
+      })
+      
+
+    }catch(err){
+      console.log("Pay With Transient Token Error: ", err)
+    }
+  }
