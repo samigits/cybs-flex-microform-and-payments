@@ -179,14 +179,14 @@ const {
 
       var instance = new cybersourceRestApi.PaymentsApi(configObject)
       var clientReferenceInformation = new cybersourceRestApi.Ptsv2paymentsClientReferenceInformation()
-      clientReferenceInformation.code = "test_flex_payments"
+      clientReferenceInformation.code = req.body.merchantReference;
       var processingInformation = new cybersourceRestApi.Ptsv2paymentsProcessingInformation()
       processingInformation.commerceIndicator = "internet";
 
       var amountDetails =
       new cybersourceRestApi.Ptsv2paymentsOrderInformationAmountDetails();
-      amountDetails.totalAmount = "102.21";
-      amountDetails.currency = "USD";
+      amountDetails.totalAmount = req.body.itemPrice;
+      amountDetails.currency = req.body.currency;
 
       var billTo = new cybersourceRestApi.Ptsv2paymentsOrderInformationBillTo();
       billTo.country = "US";
