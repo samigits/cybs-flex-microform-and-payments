@@ -188,12 +188,10 @@ const {
       amountDetails.totalAmount = req.body.itemPrice;
       amountDetails.currency = req.body.currency;
       var cardHolder = req.body.cardHolderName;
-      cardHolder = cardHolder.split(" ");
-
       var billTo = new cybersourceRestApi.Ptsv2paymentsOrderInformationBillTo();
       billTo.country = "US";
-      billTo.firstName = cardHolder[0];
-      billTo.lastName = cardHolder[1];
+      billTo.firstName = "John";
+      billTo.lastName = "Deo";
       billTo.phoneNumber = "4158880000";
       billTo.address1 = "test";
       billTo.postalCode = "94105";
