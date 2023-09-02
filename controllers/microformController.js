@@ -151,6 +151,11 @@ const {
 
   exports.payWithTransientToken = (req, res, next) =>{
     try{
+      console.log({
+        name: req.body.cardHolderName,
+        currency: req.body.currency,
+        price: req.body.itemPrice
+      })
       const configObject = {
         authenticationType: config.authenticationType,
         runEnvironment: config.runEnvironment,
@@ -179,7 +184,7 @@ const {
 
       var instance = new cybersourceRestApi.PaymentsApi(configObject)
       var clientReferenceInformation = new cybersourceRestApi.Ptsv2paymentsClientReferenceInformation()
-      clientReferenceInformation.code = req.body.merchantReference;
+      clientReferenceInformation.code = req.body.merchantReference ? req.body.merchantReference : Math.random();
       var processingInformation = new cybersourceRestApi.Ptsv2paymentsProcessingInformation()
       processingInformation.commerceIndicator = "internet";
 
@@ -188,12 +193,11 @@ const {
       amountDetails.totalAmount = req.body.itemPrice;
       amountDetails.currency = req.body.currency;
       var cardHolder = req.body.cardHolderName;
-      cardHolder = cardHolder.split(" ");
-
+      console.log("")
       var billTo = new cybersourceRestApi.Ptsv2paymentsOrderInformationBillTo();
       billTo.country = "US";
-      billTo.firstName = cardHolder[0];
-      billTo.lastName = cardHolder[1];
+      billTo.firstName = "John";
+      billTo.lastName = "Doe";
       billTo.phoneNumber = "4158880000";
       billTo.address1 = "test";
       billTo.postalCode = "94105";
@@ -207,7 +211,7 @@ const {
       new cybersourceRestApi.Ptsv2paymentsOrderInformation();
       orderInformation.amountDetails = amountDetails;
       orderInformation.billTo = billTo;
-
+      that=16
       var tokenInformation = new cybersourceRestApi.Ptsv2paymentsTokenInformation();
       tokenInformation.transientTokenJwt =req.body.flexresponse 
 
