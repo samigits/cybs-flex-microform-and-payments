@@ -9,7 +9,32 @@ const config = require("../config/defualt");
 
 exports.setupAuthentication = async (req, res, next) => {
   try {
-    var payloadAuth = req.body;
+    var isTransinetToken = req.body.isTransientToken;
+    var payloadAuth = {
+      clientReferenceInformation: {
+        code: "cybs_test",
+        partner: {
+          developerId: "7891234",
+          solutionId: "89012345",
+        },
+      },
+      ...(!isTransinetToken
+        ? {
+            paymentInformation: {
+              card: {
+                type: "001",
+                expirationMonth: "12",
+                expirationYear: "2026",
+                number: "4242424242424242",
+              },
+            },
+          }
+        : {
+            tokenInformation: {
+              transientToken: "",
+            },
+          }),
+    };
     var trxPayload = JSON.stringify(payloadAuth);
     var resource = "/risk/v1/authentication-setups/";
     var method = "post";
