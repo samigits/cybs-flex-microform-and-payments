@@ -115,13 +115,17 @@ exports.checkEnrollement = async (req, res, next) => {
     var totalAmount = req.body.totalAmount;
 
     //expected request: John Doe
-    var cardHolder = req.body.cardHolderName;
+    var cardHolder = req.body.cardHolderName ? req.body.cardHolderName : "";
     var nameHasSpace = false;
     cardHolder.indexOf(" ") != -1 ? (nameHasSpace = true) : "";
     cardHolder = cardHolder.split(" ");
+
+    var paReference = req.body.paReference ? req.body.paReference : ""
+    var returnUrl = req.body.returnUrl ? req.body.returnUrl : 'http://localhost:3000'
+    var merchantReference = req.body.referenceNumber ? req.body.referenceNumber : Math.random()
     var payloadAuth = {
       clientReferenceInformation: {
-        code: "cybs_test",
+        code: merchantReference ? merchantReference : "cybs_test",
       },
       orderInformation: {
         amountDetails: {
@@ -153,8 +157,8 @@ exports.checkEnrollement = async (req, res, next) => {
         mobilePhone: 1245789632,
       },
       consumerAuthenticationInformation: {
-        returnUrl: "http://localhost:3000",
-        referenceId: "e43c5523-f729-4080-954b-5b48cad0f99d",
+        returnUrl: returnUrl,
+        referenceId: paReference,
         transactionMode: "MOTO",
       },
     };
