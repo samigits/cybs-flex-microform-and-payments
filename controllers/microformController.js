@@ -198,6 +198,8 @@ exports.payWithTransientToken = (req, res, next) => {
       new cybersourceRestApi.Ptsv2paymentsOrderInformationAmountDetails();
     amountDetails.totalAmount = req.body.itemPrice;
     amountDetails.currency = req.body.currency;
+
+    //expected request: John Doe
     var cardHolder = req.body.cardHolderName;
     var nameHasSpace = false;
     cardHolder.indexOf(" ") != -1 ? (nameHasSpace = true) : "";

@@ -110,7 +110,54 @@ exports.setupAuthentication = async (req, res, next) => {
 
 exports.checkEnrollement = async (req, res, next) => {
   try {
-    var payloadAuth = req.body;
+    var isTransientToken = req.body.isTransientToken;
+    var currency = req.body.currency;
+    var totalAmount = req.body.totalAmount;
+
+    //expected request: John Doe
+    var cardHolder = req.body.cardHolderName;
+    var nameHasSpace = false;
+    cardHolder.indexOf(" ") != -1 ? (nameHasSpace = true) : "";
+    cardHolder = cardHolder.split(" ");
+    var payloadAuth = {
+      clientReferenceInformation: {
+        code: "cybs_test",
+      },
+      orderInformation: {
+        amountDetails: {
+          currency: currency,
+          totalAmount: totalAmount,
+        },
+        billTo: {
+          address1: "1 Market St",
+          address2: "Address 2",
+          administrativeArea: "CA",
+          country: "US",
+          locality: "san francisco",
+          firstName: nameHasSpace ? cardHolder[0] : cardHolder,
+          lastName: nameHasSpace ? cardHolder[1] : "",
+          phoneNumber: "4158880000",
+          email: "test@cybs.com",
+          postalCode: "94105",
+        },
+      },
+      paymentInformation: {
+        card: {
+          type: "001",
+          expirationMonth: "12",
+          expirationYear: "2026",
+          number: "4242424242424242",
+        },
+      },
+      buyerInformation: {
+        mobilePhone: 1245789632,
+      },
+      consumerAuthenticationInformation: {
+        returnUrl: "http://localhost:3000",
+        referenceId: "e43c5523-f729-4080-954b-5b48cad0f99d",
+        transactionMode: "MOTO",
+      },
+    };
     var trxPayload = JSON.stringify(payloadAuth);
     var resource = "/risk/v1/authentications/";
     var method = "post";
