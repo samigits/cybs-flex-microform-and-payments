@@ -119,13 +119,21 @@ exports.checkEnrollement = async (req, res, next) => {
     var nameHasSpace = false;
     cardHolder.indexOf(" ") != -1 ? (nameHasSpace = true) : "";
     cardHolder = cardHolder.split(" ");
-
     var paReference = req.body.paReference ? req.body.paReference : ""
     var returnUrl = req.body.returnUrl ? req.body.returnUrl : 'http://localhost:3000'
-    var merchantReference = req.body.referenceNumber ? req.body.referenceNumber : Math.random()
+    var merchantReference = req.body.referenceNumber ? req.body.referenceNumber : Math.random()*(9999999-1000000+1) + 1000000
+    var cavvAuth = req.body.cavvAtuh ? req.body.cavvAuth : "";
+    var xidAuth = req.body.xidAuth ? req.body.xidAuth : "";
+    var authDirectoryServeTrxId = req.body.authDirectoryServeTrxId ? req.body.authDirectoryServeTrxId :""
+    var authSpecificationVersion = req.body.authSpecificationVersion ? req.body.authSpecificationVersion : ""
+    var ecommerceIndicatorAuth = req.body.ecommerceIndicatorAuth ? req.body.ecommerceIndicatorAuth : ''
+
     var payloadAuth = {
       clientReferenceInformation: {
         code: merchantReference ? merchantReference : "cybs_test",
+      },
+      processingInformation:{
+        commerceIndicator:ecommerceIndicatorAuth
       },
       orderInformation: {
         amountDetails: {
@@ -160,6 +168,10 @@ exports.checkEnrollement = async (req, res, next) => {
         returnUrl: returnUrl,
         referenceId: paReference,
         transactionMode: "MOTO",
+        cavv:cavvAuth,
+        xid:xidAuth,
+        directoryServerTransactionId: authDirectoryServeTrxId,
+        paSpecificationVersion:authSpecificationVersion
       },
     };
     var trxPayload = JSON.stringify(payloadAuth);
