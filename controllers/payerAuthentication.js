@@ -12,9 +12,6 @@ exports.setupAuthentication = async (req, res, next) => {
     console.log("\n\n Req Body: ", req.body)
     var isTransientToken = req.body.isTransientToken;
     var transientToken = req.body.transientToken ? req.body.transientToken : ""
-    if(isTransientToken){
-      console.log("\n\n it is transient \n\n")
-    }
     var payloadAuth = {
       clientReferenceInformation: {
         code: "cybs_test",
@@ -36,7 +33,7 @@ exports.setupAuthentication = async (req, res, next) => {
           }
         : {
             tokenInformation: {
-              transientToken: "eyJraWQiOiIwOHJXUnNsRnVnSXMyaHBqTTgyTDlIbkxRWnY2aGdGTiIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzA4IiwiZXhwIjoxNjk0MDg5ODU3LCJ0eXBlIjoibWYtMi4wLjAiLCJpYXQiOjE2OTQwODg5NTcsImp0aSI6IjFFNUQzUDZBWFlVNzdRRFFaWjJMTFFQVzgxVkpTRjFaOVlBMktFWU5RRlI3SDlZNzY3Vjk2NEY5QzI4MTIwM0YiLCJjb250ZW50Ijp7InBheW1lbnRJbmZvcm1hdGlvbiI6eyJjYXJkIjp7ImV4cGlyYXRpb25ZZWFyIjp7InZhbHVlIjoiMjAyNiJ9LCJudW1iZXIiOnsibWFza2VkVmFsdWUiOiJYWFhYWFhYWFhYWFg0MjQyIiwiYmluIjoiNDI0MjQyIn0sInNlY3VyaXR5Q29kZSI6e30sImV4cGlyYXRpb25Nb250aCI6eyJ2YWx1ZSI6IjEyIn0sInR5cGUiOnsidmFsdWUiOiIwMDEifX19fX0.3828JVq6exgWC3CgZPkjuzx8bw8DmSfLcmbyws1TaxE8GA1MIRo1krXHC_khf2oQ_HFIHEueYaDLWdYioI5Jk-t5KCTGVuvb4JhYriW3lqt79yiuh1mAgb4MqaOEaymA2Hk0HqtFkE_wKPoh5LJ-WAI6eE0tnflzk1HulOzi7usfvlOgaWvZv4Ufeky-xlDfb-yrl4OvZNwur5hDPoR3fvB92bEozR3r6Ybc5iKFmNWyXNS8V9LoCXpsO8PdF6szZSg3bEn7bVE4aMG1oYXtdmxHiZEvNwCJCDYCN8Yj93i39VRZMZyCgvvFU2We82Dh4OL-_aZdm4rqforPAEA9yw",
+              transientToken: transientToken
             },
           }),
     };

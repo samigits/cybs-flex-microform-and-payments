@@ -72,6 +72,8 @@ exports.paymentAuthorization = async (req, res, next) => {
 
 exports.authWithTransientToken = (req, res, next) => {
   try {
+    console.log("Body: ", req.body)
+    let tToken = req.body.flexresponse ? req.body.flexresponse : "";
     var payload = {
       clientReferenceInformation: {
         code: "TC50171_3",
@@ -96,8 +98,7 @@ exports.authWithTransientToken = (req, res, next) => {
         },
       },
       tokenInformation: {
-        transientTokenJwt:
-          "eyJraWQiOiIwMFN2SWFHSWZ5YXc4OTdyRGVHOWVGZE9ES2FDS2MxcSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzAwIiwiZXhwIjoxNjE0NzkyNTQ0LCJ0eXBlIjoiYXBpLTAuMS4wIiwiaWF0IjoxNjE0NzkxNjQ0LCJqdGkiOiIxRDBWMzFQMUtMRTNXN1NWSkJZVE04VUcxWE0yS0lPRUhJVldBSURPkhLNjJJSFQxUVE1NjAzRkM3NjA2MDlDIn0.FrN1ytYcpQkn8TtafyFZnJ3dV3uu1XecDJ4TRIVZN-jpNbamcluAKVZ1zfdhbkrB6aNVWECSvjZrbEhDKCkHCG8IjChzl7Kg642RWteLkWz3oiofgQqFfzTuq41sDhlIqB-UatveU_2ukPxLYl87EX9ytpx4zCJVmj6zGqdNP3q35Q5y59cuLQYxhRLk7WVx9BUgW85tl2OHaajEc25tS1FwH3jDOfjAC8mu2MEk-Ew0-ukZ70Ce7Zaq4cibg_UTRx7_S2c4IUmRFS3wikS1Vm5bpvcKLr9k_8b9YnddIzp0p0JOCjXC_nuofQT7_x_-CQayx2czE0kD53HeNYC5hQ",
+        transientTokenJwt: tToken
       },
     };
     var trxPayload = JSON.stringify(payload);
