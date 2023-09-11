@@ -8,7 +8,78 @@ const config = require("../config/defualt");
 
 exports.paymentAuthorization = async (req, res, next) => {
   try {
-    var payload = req.body;
+    console.log("Body: ", req.body)
+    var totalAmount = req.body.itemPrice;
+    var currency = req.body.currency;
+
+    //expected request: John Doe
+    var cardHolder = req.body.cardHolderName;
+    var nameHasSpace = false;
+    cardHolder.indexOf(" ") != -1 ? (nameHasSpace = true) : "";
+    cardHolder = cardHolder.split(" ");
+
+    var paReference = req.body.paReference ? req.body.paReference : "";
+    var returnUrl = req.body.returnUrl
+      ? req.body.returnUrl
+      : "http://localhost:3000";
+    var merchantReference = req.body.referenceNumber
+      ? req.body.referenceNumber
+      : Math.random() * (9999999 - 1000000 + 1) + 1000000;
+    var cavvAuth = req.body.cavvAuth ? req.body.cavvAuth : "";
+    var xidAuth = req.body.xidAuth ? req.body.xidAuth : "";
+    var authDirectoryServeTrxId = req.body.authDirectoryServeTrxId
+      ? req.body.authDirectoryServeTrxId
+      : "";
+    var authSpecificationVersion = req.body.authSpecificationVersion
+      ? req.body.authSpecificationVersion
+      : "";
+    var ecommerceIndicatorAuth = req.body.ecommerceIndicatorAuth
+      ? req.body.ecommerceIndicatorAuth
+      : "vbv";
+    var payload = {
+      clientReferenceInformation: {
+        code: "test_payment",
+      },
+      processingInformation: {
+        commerceIndicator: ecommerceIndicatorAuth,
+      },
+      orderInformation: {
+        billTo: {
+          firstName: nameHasSpace ? cardHolder[0] : cardHolder,
+          lastName: nameHasSpace ? cardHolder[1] : "",
+          address1: "1 Market St",
+          postalCode: "94105",
+          locality: "san francisco",
+          administrativeArea: "CA",
+          country: "US",
+          phoneNumber: "4158880000",
+          company: "Visa",
+          email: "test@cybs.com",
+        },
+        amountDetails: {
+          totalAmount: totalAmount,
+          currency: currency,
+        },
+      },
+      paymentInformation: {
+        card: {
+          expirationYear: "2026",
+          number: "4242424242424242",
+          securityCode: "123",
+          expirationMonth: "12",
+        },
+      },
+      consumerAuthenticationInformation: {
+        returnUrl: returnUrl,
+        referenceId: paReference,
+        transactionMode: "MOTO",
+        cavv: cavvAuth,
+        xid: xidAuth,
+        directoryServerTransactionId: authDirectoryServeTrxId,
+        paSpecificationVersion: authSpecificationVersion,
+      },
+    };
+    console.log("Payload: ", payload)
     var trxPayload = JSON.stringify(payload);
     var resource = "/pts/v2/payments";
     var method = "post";
@@ -45,7 +116,6 @@ exports.paymentAuthorization = async (req, res, next) => {
     request.accept(acceptType);
 
     request.end((err, response) => {
-      console.log("auth response", response);
       var data = response.body ? response.body : response.text;
       if (
         data === null ||
@@ -72,7 +142,7 @@ exports.paymentAuthorization = async (req, res, next) => {
 
 exports.authWithTransientToken = (req, res, next) => {
   try {
-    console.log("Body: ", req.body)
+    console.log("Body: ", req.body);
     let tToken = req.body.flexresponse ? req.body.flexresponse : "";
     var payload = {
       clientReferenceInformation: {
@@ -98,7 +168,7 @@ exports.authWithTransientToken = (req, res, next) => {
         },
       },
       tokenInformation: {
-        transientTokenJwt: tToken
+        transientTokenJwt: tToken,
       },
     };
     var trxPayload = JSON.stringify(payload);
