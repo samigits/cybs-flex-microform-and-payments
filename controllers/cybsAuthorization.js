@@ -8,7 +8,6 @@ const config = require("../config/defualt");
 
 exports.paymentAuthorization = async (req, res, next) => {
   try {
-    console.log("Body: ", req.body)
     var totalAmount = req.body.itemPrice;
     var currency = req.body.currency;
 
@@ -79,7 +78,6 @@ exports.paymentAuthorization = async (req, res, next) => {
         paSpecificationVersion: authSpecificationVersion,
       },
     };
-    console.log("Payload: ", payload)
     var trxPayload = JSON.stringify(payload);
     var resource = "/pts/v2/payments";
     var method = "post";
@@ -142,7 +140,6 @@ exports.paymentAuthorization = async (req, res, next) => {
 
 exports.authWithTransientToken = (req, res, next) => {
   try {
-    console.log("Body: ", req.body);
     let tToken = req.body.flexresponse ? req.body.flexresponse : "";
     var payload = {
       clientReferenceInformation: {

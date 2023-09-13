@@ -4,14 +4,15 @@ const {
   digestGenerator,
 } = require("../services/HashServices");
 const { normalizeParams } = require("../services/formatService");
-
+const jwt = require("jsonwebtoken");
 const config = require("../config/defualt");
+
 
 exports.setupAuthentication = async (req, res, next) => {
   try {
     console.log("\n\n Req Body: ", req.body);
     var isTransientToken = req.body.isTransientToken;
-    var transientToken = req.body.transientToken ? req.body.transientToken : "";
+    var transientToken = await req.body.transientToken ? req.body.transientToken : "";
     var payloadAuth = {
       clientReferenceInformation: {
         code: "cybs_test",
@@ -33,12 +34,11 @@ exports.setupAuthentication = async (req, res, next) => {
           }
         : {
             tokenInformation: {
-              transientToken: transientToken,
+              transientToken: transientToken
             },
           }),
     };
 
-    console.log("payload: ", payloadAuth);
     var trxPayload = JSON.stringify(payloadAuth);
     var resource = "/risk/v1/authentication-setups/";
     var method = "post";
@@ -117,7 +117,7 @@ exports.checkEnrollement = async (req, res, next) => {
     var isTransientToken = req.body.isTransientToken;
     var currency = req.body.currency;
     var totalAmount = req.body.totalAmount;
-
+    var transientToken = await req.body.flexresponse ? req.body.flexresponse : "";
     //expected request: John Doe
     var cardHolder = req.body.cardHolderName ? req.body.cardHolderName : "";
     var nameHasSpace = false;
@@ -167,14 +167,22 @@ exports.checkEnrollement = async (req, res, next) => {
           postalCode: "94105",
         },
       },
-      paymentInformation: {
-        card: {
-          type: "001",
-          expirationMonth: "12",
-          expirationYear: "2026",
-          number: "4242424242424242",
-        },
-      },
+      ...(!isTransientToken
+        ? {
+            paymentInformation: {
+              card: {
+                type: "001",
+                expirationMonth: "12",
+                expirationYear: "2026",
+                number: "4242424242424242",
+              },
+            },
+          }
+        : {
+            tokenInformation: {
+              transientToken: transientToken
+            },
+          }),
       buyerInformation: {
         mobilePhone: 1245789632,
       },
@@ -223,7 +231,7 @@ exports.checkEnrollement = async (req, res, next) => {
 
     request.accept(acceptType);
     request.end((error, response) => {
-      var data = response.body;
+      var data = response.body ? response.body : response.text;
       if (
         data == null ||
         (typeof data === "object" &&
