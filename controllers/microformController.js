@@ -136,13 +136,9 @@ exports.captureContextFromSdk = (req, res, next) => {
         } else if (data) {
           console.log("\nData: " + JSON.stringify(data));
         }
-        const jwtToken = data;
-        const decodedToken = jwt.decode(jwtToken, { complete: true });
-        //const verifiedToken = jwt.verify(jwtToken, 'f47ee8f5-8c1f-4d2d-b2a1-1f8e2cacab2a')
         res.json({
           success: true,
-          data: data,
-          decoded: decodedToken,
+          data: data
         });
       }
     );
@@ -151,6 +147,26 @@ exports.captureContextFromSdk = (req, res, next) => {
   }
 };
 
+
+exports.validateToken = (req, res, next) => {
+  try{
+    let flexToken =  req.body.flexToken;
+    flexToken = flexToken.replace(/["]/g, '')
+    console.log(flexToken)
+    const verificationResult = jwt.decode(flexToken, { complete: true });
+    console.log("backend: ", verificationResult)
+    res.json({
+      success: true,
+      data: verificationResult
+    })
+  }catch(err){
+    console.log("Error: ", err)
+    res.status(500).json({
+      success: false,
+      error: "Token verification failed",
+    });
+  }
+}
 exports.payWithTransientToken = (req, res, next) => {
   try {
     console.log({
