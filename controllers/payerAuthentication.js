@@ -4,7 +4,6 @@ const {
   digestGenerator,
 } = require("../services/HashServices");
 const { normalizeParams } = require("../services/formatService");
-const jwt = require("jsonwebtoken");
 const config = require("../config/defualt");
 
 
@@ -87,15 +86,7 @@ exports.setupAuthentication = async (req, res, next) => {
         // SuperAgent does not always produce a body; use the unparsed response as a fallback
         data = response.text;
       }
-
-      console.log("\n -- Response Message for POST call --");
-      console.log("\tResponse Code : " + response["status"]);
-      console.log(
-        "\tv-c-correlation-id : " + response.headers["v-c-correlation-id"]
-      );
-      console.log("\tResponse Data Setup :");
-      console.log(JSON.stringify(data));
-
+      console.log("\n\n Authentication Setup:", data);
       var _status = -1;
       if (response["status"] >= 200 && response["status"] <= 299) {
         _status = 0;
@@ -246,6 +237,7 @@ exports.checkEnrollement = async (req, res, next) => {
       if (response["status"] >= 200 && response["status"] <= 299) {
         _status = 0;
       }
+      console.log("\n\n Auth Enrollement: ", data)
       res.json({
         ok: true,
         header: response.header,
