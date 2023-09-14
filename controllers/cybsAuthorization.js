@@ -115,6 +115,7 @@ exports.paymentAuthorization = async (req, res, next) => {
 
     request.end((err, response) => {
       var data = response.body ? response.body : response.text;
+      console.log("\n\n Authorization : ", data)
       if (
         data === null ||
         (typeof data === "object" &&

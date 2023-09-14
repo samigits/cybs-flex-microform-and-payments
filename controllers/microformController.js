@@ -134,7 +134,7 @@ exports.captureContextFromSdk = (req, res, next) => {
         if (error) {
           console.log("\nError: ", JSON.stringify(error));
         } else if (data) {
-          console.log("\nData: " + JSON.stringify(data));
+          console.log("\n Capture Context: " + JSON.stringify(data));
         }
         res.json({
           success: true,
@@ -152,9 +152,9 @@ exports.validateToken = (req, res, next) => {
   try{
     let flexToken =  req.body.flexToken;
     flexToken = flexToken.replace(/["]/g, '')
-    console.log(flexToken)
+    console.log("\n\n Transient Token: ",flexToken)
     const verificationResult = jwt.decode(flexToken, { complete: true });
-    console.log("backend: ", verificationResult)
+    console.log("\n\n Verified Result: ", verificationResult)
     res.json({
       success: true,
       data: verificationResult
