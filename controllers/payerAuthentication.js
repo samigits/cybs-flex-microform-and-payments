@@ -6,12 +6,13 @@ const {
 const { normalizeParams } = require("../services/formatService");
 const config = require("../config/defualt");
 
-
 exports.setupAuthentication = async (req, res, next) => {
   try {
     console.log("\n\n Req Body: ", req.body);
     var isTransientToken = req.body.isTransientToken;
-    var transientToken = await req.body.transientToken ? req.body.transientToken : "";
+    var transientToken = (await req.body.transientToken)
+      ? req.body.transientToken
+      : "";
     var payloadAuth = {
       clientReferenceInformation: {
         code: "cybs_test",
@@ -33,7 +34,7 @@ exports.setupAuthentication = async (req, res, next) => {
           }
         : {
             tokenInformation: {
-              transientToken: transientToken
+              transientToken: transientToken,
             },
           }),
     };
@@ -108,16 +109,16 @@ exports.checkEnrollement = async (req, res, next) => {
     var isTransientToken = req.body.isTransientToken;
     var currency = req.body.currency;
     var totalAmount = req.body.totalAmount;
-    var transientToken = await req.body.flexresponse ? req.body.flexresponse : "";
+    var transientToken = (await req.body.flexresponse)
+      ? req.body.flexresponse
+      : "";
     //expected request: John Doe
     var cardHolder = req.body.cardHolderName ? req.body.cardHolderName : "";
     var nameHasSpace = false;
     cardHolder.indexOf(" ") != -1 ? (nameHasSpace = true) : "";
     cardHolder = cardHolder.split(" ");
     var paReference = req.body.paReference ? req.body.paReference : "";
-    var returnUrl = req.body.returnUrl
-      ? req.body.returnUrl
-      : "http://localhost:3000";
+    var returnUrl = req.body.returnUrl ? req.body.returnUrl : "localhost:3000";
     var merchantReference = req.body.referenceNumber
       ? req.body.referenceNumber
       : Math.random() * (9999999 - 1000000 + 1) + 1000000;
@@ -171,7 +172,7 @@ exports.checkEnrollement = async (req, res, next) => {
           }
         : {
             tokenInformation: {
-              transientToken: transientToken
+              jti: transientToken,
             },
           }),
       buyerInformation: {
@@ -185,9 +186,13 @@ exports.checkEnrollement = async (req, res, next) => {
         xid: xidAuth,
         directoryServerTransactionId: authDirectoryServeTrxId,
         paSpecificationVersion: authSpecificationVersion,
+        challengeCode: "04",
+        deviceChannel: "Browser",
+        messageCategory: "01",
       },
     };
     var trxPayload = JSON.stringify(payloadAuth);
+    console.log("\n\n payload auth: ", payloadAuth)
     var resource = "/risk/v1/authentications/";
     var method = "post";
     var statusCode = -1;
@@ -237,7 +242,7 @@ exports.checkEnrollement = async (req, res, next) => {
       if (response["status"] >= 200 && response["status"] <= 299) {
         _status = 0;
       }
-      console.log("\n\n Auth Enrollement: ", data)
+      console.log("\n\n Auth Enrollement: ", data);
       res.json({
         ok: true,
         header: response.header,
