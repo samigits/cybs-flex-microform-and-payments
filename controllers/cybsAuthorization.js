@@ -10,9 +10,11 @@ exports.paymentAuthorization = async (req, res, next) => {
   try {
     var totalAmount = req.body.itemPrice;
     var currency = req.body.currency;
+    var isTransientToken = req.body.isTransientToken;
+    var transientToken = req.body.flexresponse ? req.body.flexresponse :"";
 
     //expected request: John Doe
-    var cardHolder = req.body.cardHolderName;
+    var cardHolder = req.body.cardHolderName; 
     var nameHasSpace = false;
     cardHolder.indexOf(" ") != -1 ? (nameHasSpace = true) : "";
     cardHolder = cardHolder.split(" ");
@@ -60,14 +62,22 @@ exports.paymentAuthorization = async (req, res, next) => {
           currency: currency,
         },
       },
-      paymentInformation: {
-        card: {
-          expirationYear: "2026",
-          number: "4242424242424242",
-          securityCode: "123",
-          expirationMonth: "12",
-        },
-      },
+      ...(isTransientToken != 1
+        ? {
+            paymentInformation: {
+              card: {
+                type: "001",
+                expirationMonth: "12",
+                expirationYear: "2026",
+                number: "4242424242424242",
+              },
+            },
+          }
+        : {
+            tokenInformation: {
+              jti: transientToken,
+            },
+          }),
       consumerAuthenticationInformation: {
         returnUrl: returnUrl,
         referenceId: paReference,
@@ -115,7 +125,7 @@ exports.paymentAuthorization = async (req, res, next) => {
 
     request.end((err, response) => {
       var data = response.body ? response.body : response.text;
-      console.log("\n\n Authorization : ", data)
+      console.log("\n\n Authorization : ", data);
       if (
         data === null ||
         (typeof data === "object" &&
@@ -139,95 +149,3 @@ exports.paymentAuthorization = async (req, res, next) => {
   } catch (err) {}
 };
 
-exports.authWithTransientToken = (req, res, next) => {
-  try {
-    let tToken = req.body.flexresponse ? req.body.flexresponse : "";
-    var payload = {
-      clientReferenceInformation: {
-        code: "TC50171_3",
-      },
-      orderInformation: {
-        amountDetails: {
-          totalAmount: "102.21",
-          currency: "USD",
-        },
-        billTo: {
-          firstName: "RTS",
-          lastName: "VDP",
-          address1: "201 S. Division St.",
-          locality: "Ann Arbor",
-          administrativeArea: "MI",
-          postalCode: "48104-2201",
-          country: "US",
-          district: "MI",
-          buildingNumber: "123",
-          email: "test@cybs.com",
-          phoneNumber: "999999999",
-        },
-      },
-      tokenInformation: {
-        transientTokenJwt: tToken,
-      },
-    };
-    var trxPayload = JSON.stringify(payload);
-    var resource = "/pts/v2/payments";
-    var method = "post";
-    var statusCode = -1;
-    var url = "https://apitest.cybersource.com" + resource;
-
-    var headerParams = {};
-    var contentType = "application/json;charset=utf-8";
-    var acceptType = "application/hal+json;charset=utf-8";
-    var request = superagent(method, url);
-    var bodyParam = trxPayload;
-
-    var signature = generateHttpSignature(resource, method, bodyParam);
-    var date = new Date(Date.now()).toUTCString();
-    var digest = digestGenerator(trxPayload);
-    digest = "SHA-256=" + digest;
-
-    headerParams["digest"] = digest;
-    headerParams["v-c-merchant-id"] = config.merchant.merchantId;
-    headerParams["date"] = date;
-    headerParams["host"] = config.runEnvironment;
-    headerParams["signature"] = signature;
-    headerParams["User-Agent"] = "Mozilla/5.0";
-    //set header parameters
-    request.set(normalizeParams(headerParams));
-
-    //set timeout
-    request.timeout(5000);
-
-    request.type(contentType);
-
-    request.send(bodyParam);
-
-    request.accept(acceptType);
-
-    request.end((err, response) => {
-      console.log("auth response", response);
-      var data = response.body ? response.body : response.text;
-      if (
-        data === null ||
-        (typeof data === "object" &&
-          typeof data.length === "undefined" &&
-          !Object.keys(data).length)
-      ) {
-        // SuperAgent does not always produce a body; use the unparsed response as a fallback
-        data = response.text;
-      }
-
-      var _status = -1;
-      if (response["status"] >= 200 && response["status"] <= 299) {
-        _status = 0;
-      }
-      res.json({
-        ok: true,
-        header: response.header,
-        data: data ? data : JSON.parse(response.text),
-      });
-    });
-  } catch (err) {
-    console.log("Auth with TntToken:", err);
-  }
-};
